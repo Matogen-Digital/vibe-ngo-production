@@ -20,6 +20,12 @@ export function CloudflareLogo(props: React.SVGProps<SVGSVGElement> & { color1?:
 	);
 }
 
+export function MatogenLogo(props: React.ImgHTMLAttributes<HTMLImageElement>) {
+	return (
+		<img src="/matogen-logo.png" alt="Matogen Logo" {...props} />
+	);
+}
+
 export function TypeScriptIcon(props: React.SVGProps<SVGSVGElement>) {
 	return (
 		<svg viewBox="0 0 400 400" id="Layer_1" xmlns="http://www.w3.org/2000/svg" {...props}>
