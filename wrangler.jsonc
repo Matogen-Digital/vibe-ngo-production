@@ -51,12 +51,13 @@
     "dispatch_namespaces": [
         {
             "binding": "DISPATCHER",
-            "namespace": "vibesdk-default-namespace",
+            "namespace": "vibe-ngo-namespace",
             "remote": true
         }
     ],
-	"containers": [
+/* 	"containers": [
 		{
+            "name": "Sandbox",
 			"class_name": "UserAppSandboxService",
 			"image": "./SandboxDockerfile",
             // "image": "registry.cloudflare.com/vibesdk-production-userappsandboxservice:cfe197fc",
@@ -70,16 +71,16 @@
             },
             "rollout_step_percentage": 100
 		}
-	],
+	], */
 	"d1_databases": [
-		{
-			"binding": "DB",
-			"database_name": "vibe-ngo-db",
-			"database_id": "01d50cee-d3cc-4eca-a90f-dfdc9ef4d0ba",
-			"migrations_dir": "migrations",
-			"remote": true
-		}
-	],
+        {
+            "binding": "DB",
+            "database_name": "vibe-ngo-db",
+            "database_id": "01d50cee-d3cc-4eca-a90f-dfdc9ef4d0ba",
+            "migrations_dir": "migrations",
+            "remote": true
+        }
+    ],
 	"durable_objects": {
 		"bindings": [
 			{
@@ -97,16 +98,16 @@
 		]
 	},
     "r2_buckets": [
-      {
-        "binding": "TEMPLATES_BUCKET",
-        "bucket_name": "vibe-ngo-templates",
-        "remote": true
-      }
+        {
+            "binding": "TEMPLATES_BUCKET",
+            "bucket_name": "vibe-ngo-templates",
+            "remote": true
+        }
     ],
     "kv_namespaces": [
         {
             "binding": "VibecoderStore",
-            "id": "a6c8604ff9814358a3c39d6a3b5dd0ea",
+            "id": "c9bfeb60828e498fada32e0a35703751",
             "remote": true
         }
     ],
@@ -130,13 +131,13 @@
 	],
 	"routes": [
         {
-            "pattern": "build.cloudflare.dev",
+            "pattern": "good.storiesandscience.co.za",
             "custom_domain": true
         },
         {
-            "pattern": "*build-preview.cloudflare.dev/*",
+            "pattern": "*good.storiesandscience.co.za/*",
             "custom_domain": false,
-            "zone_id": "db01fac4261b2604aacad8410443a3e2"
+            "zone_id": "6a1d36e574b22356df16fc3370c3e715"
         }
     ],
 	"vars": {
