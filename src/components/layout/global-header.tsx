@@ -5,7 +5,7 @@ import { ThemeToggle } from '../theme-toggle';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/auth-context';
 import { ChevronRight, AlertCircle } from 'lucide-react';
-import { CloudflareLogo, MatogenLogo } from '../icons/logos';
+import { MatogenLogo } from '../icons/logos';
 import { usePlatformStatus } from '@/hooks/use-platform-status';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -82,9 +82,9 @@ export function GlobalHeader() {
 							<div className="gap-6 flex flex-col justify-between border px-4 bg-bg-4 dark:bg-bg-2 rounded-md py-1.5 border-accent/50 dark:border-accent/50 !border-t-transparent rounded-t-none ml-2 md:ml-6 -mt-2">
 								<div className="flex w-full gap-2 items-center">
 									<div className='text-text-primary/80 mr-4 text-lg font-medium'>Questions? Chat to the Matogen Digital Team</div>
-									<div className="flex font-semibold gap-2 items-center bg-accent dark:bg-accent text-white rounded px-2 hover:opacity-80 cursor-pointer" onClick={() => window.open("mailto:support@digital.matogen.com?subject=Questions%20about%20Vibe%20NGO", "_blank")}>
-										Email us <MatogenLogo className='w-8 h-5' />
-									</div>
+									<a href="https://digital.matogen.com/contact/" className="flex font-semibold gap-2 items-center bg-accent dark:bg-accent text-white rounded px-2 hover:opacity-80 cursor-pointer">
+										Contact Us <MatogenLogo className='w-8 h-5' />
+									</a>
 								</div>
 							</div>
 							{/* Disable cost display for now */}

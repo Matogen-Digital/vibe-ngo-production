@@ -38,6 +38,7 @@ export const WebSocketMessageResponses: Record<string, WebSocketMessageType> = {
     
     ERROR: 'error',
     RATE_LIMIT_ERROR: 'rate_limit_error',
+    RATE_LIMIT_WARNING: 'rate_limit_warning',
 
     CODE_REVIEWING: 'code_reviewing',
     CODE_REVIEWED: 'code_reviewed',

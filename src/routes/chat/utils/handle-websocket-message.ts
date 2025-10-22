@@ -677,6 +677,25 @@ export function createWebSocketMessageHandler(deps: HandleMessageDeps) {
                 break;
             }
 
+            case 'rate_limit_warning': {
+                const warningMessage = createAIMessage(
+                    `rate_limit_warning_${Date.now()}`,
+                    `⚠️ ${message.message}`,
+                    false
+                );
+                setMessages(prev => [...prev, warningMessage]);
+                
+                onDebugMessage?.(
+                    'warning',
+                    'Rate Limit Warning',
+                    message.message,
+                    'WebSocket',
+                    'rate_limit',
+                    { retryAfter: message.retryAfter }
+                );
+                break;
+            }
+
             default:
                 logger.warn('Unhandled message:', message);
         }

@@ -232,29 +232,41 @@ export class SimpleCodeGeneratorAgent extends Agent<Env, CodeGenState> {
     }
 
     async saveToDatabase() {
-        this.logger().info(`Blueprint generated successfully for agent ${this.getAgentId()}`);
-        // Save the app to database (authenticated users only)
-        const appService = new AppService(this.env);
-        await appService.createApp({
-            id: this.state.inferenceContext.agentId,
-            userId: this.state.inferenceContext.userId,
-            sessionToken: null,
-            title: this.state.blueprint.title || this.state.query.substring(0, 100),
-            description: this.state.blueprint.description || null,
-            originalPrompt: this.state.query,
-            finalPrompt: this.state.query,
-            framework: this.state.blueprint.frameworks?.[0],
-            visibility: 'private',
-            status: 'generating',
-            createdAt: new Date(),
-            updatedAt: new Date()
-        });
-        this.logger().info(`App saved successfully to database for agent ${this.state.inferenceContext.agentId}`, { 
-            agentId: this.state.inferenceContext.agentId, 
-            userId: this.state.inferenceContext.userId,
-            visibility: 'private'
-        });
-        this.logger().info(`Agent initialized successfully for agent ${this.state.inferenceContext.agentId}`);
+        try {
+            this.logger().info(`Blueprint generated successfully for agent ${this.getAgentId()}`);
+            // Save the app to database (authenticated users only)
+            const appService = new AppService(this.env);
+            const app = await appService.createApp({
+                id: this.state.inferenceContext.agentId,
+                userId: this.state.inferenceContext.userId,
+                sessionToken: null,
+                title: this.state.blueprint.title || this.state.query.substring(0, 100),
+                description: this.state.blueprint.description || null,
+                originalPrompt: this.state.query,
+                finalPrompt: this.state.query,
+                framework: this.state.blueprint.frameworks?.[0],
+                visibility: 'private',
+                status: 'generating',
+                deploymentId: null,
+                screenshotUrl: null,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            });
+            this.logger().info(`App saved successfully to database for agent ${this.state.inferenceContext.agentId}`, { 
+                agentId: this.state.inferenceContext.agentId, 
+                userId: this.state.inferenceContext.userId,
+                visibility: 'private',
+                appId: app.id
+            });
+            this.logger().info(`Agent initialized successfully for agent ${this.state.inferenceContext.agentId}`);
+        } catch (error) {
+            this.logger().error(`Failed to save app to database for agent ${this.getAgentId()}:`, error);
+            // Broadcast error to frontend so user knows something went wrong
+            this.broadcast(WebSocketMessageResponses.ERROR, {
+                error: `Failed to save app to database: ${error instanceof Error ? error.message : String(error)}`
+            });
+            throw error; // Re-throw to let caller handle as appropriate
+        }
     }
 
     /**
@@ -327,7 +339,15 @@ export class SimpleCodeGeneratorAgent extends Agent<Env, CodeGenState> {
             });
         }
         this.logger().info(`Agent ${this.getAgentId()} session: ${this.state.sessionId} initialized successfully`);
-        await this.saveToDatabase();
+        
+        // Try to save to database, but don't fail the entire initialization if it fails
+        try {
+            await this.saveToDatabase();
+        } catch (error) {
+            this.logger().error(`Agent initialization continuing despite database save failure for ${this.getAgentId()}:`, error);
+            // Don't re-throw - allow agent to continue working even if database save fails
+        }
+        
         return this.state;
     }
 
@@ -2480,12 +2500,14 @@ export class SimpleCodeGeneratorAgent extends Agent<Env, CodeGenState> {
             const { conversationResponse, conversationState } = conversationalResponse;
             this.setConversationState(conversationState);
 
-             if (!this.isGenerating) {
-                // If idle, start generation process
-                this.logger().info('User input during IDLE state, starting generation');
+             if (!this.isGenerating && this.state.pendingUserInputs.length > 0) {
+                // Only start generation if there are actual modification requests queued
+                this.logger().info('User input with pending modifications during IDLE state, starting generation');
                 this.generateAllFiles().catch(error => {
                     this.logger().error('Error starting generation from user input:', error);
                 });
+            } else if (!this.isGenerating) {
+                this.logger().info('User input processed - no generation needed (conversational only)');
             }
 
             this.logger().info('User input processed successfully', {

@@ -26,6 +26,12 @@ type RateLimitErrorMessage = {
     error: RateLimitExceededError;
 };
 
+type RateLimitWarningMessage = {
+	type: 'rate_limit_warning';
+    message: string;
+    retryAfter: number;
+};
+
 type GenerationStartedMessage = {
 	type: 'generation_started';
 	message: string;
@@ -416,6 +422,7 @@ export type WebSocketMessage =
 	| GitHubExportErrorMessage
 	| ErrorMessage
     | RateLimitErrorMessage
+    | RateLimitWarningMessage
 	| UserSuggestionsProcessingMessage
 	| ConversationResponseMessage
 	| ConversationClearedMessage

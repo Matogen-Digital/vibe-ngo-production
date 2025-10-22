@@ -64,7 +64,7 @@
             // Altering max_instances value will have no effect. Please use the MAX_SANDBOX_INSTANCES var instead.
 			"max_instances": 50,
             // ATTENTION: Altering instance_type value will have no effect. Please use the SANDBOX_INSTANCE_TYPE var instead.
-            "instance_type": "standard",
+            "instance_type": "standard-3",
             "rollout_step_percentage": 100
 		}
 	],
@@ -144,8 +144,7 @@
         "CLOUDFLARE_AI_GATEWAY": "vibesdk-gateway",
         "MAX_SANDBOX_INSTANCES": "50",
         "SANDBOX_INSTANCE_TYPE": "standard-3",
-        "USE_CLOUDFLARE_IMAGES": false,
-        "CUSTOM_DOMAIN": "good.storiesandscience.co.za"
+        "USE_CLOUDFLARE_IMAGES": false
     },
 	"workers_dev": false,
 	"preview_urls": false

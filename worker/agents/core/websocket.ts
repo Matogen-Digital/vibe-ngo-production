@@ -33,7 +33,20 @@ export function handleWebSocketMessage(agent: SimpleCodeGeneratorAgent, connecti
                 logger.info('Starting code generation process');
                 agent.generateAllFiles().catch(error => {
                     logger.error('Error during code generation:', error);
-                    sendError(connection, `Error generating files: ${error instanceof Error ? error.message : String(error)}`);
+                    // Handle rate limit errors gracefully during generation
+                    if (error instanceof Error && (error.message.includes('Rate limit exceeded') || error.message.includes('rate limit'))) {
+                        logger.warn('Rate limit hit during generation, will retry automatically');
+                        try {
+                            sendToConnection(connection, WebSocketMessageResponses.RATE_LIMIT_WARNING, {
+                                message: 'Generation paused due to rate limits. Will resume automatically in a moment.',
+                                retryAfter: 60000 // 1 minute
+                            });
+                        } catch (wsError) {
+                            logger.error('Failed to send rate limit warning:', wsError);
+                        }
+                    } else {
+                        sendError(connection, `Error generating files: ${error instanceof Error ? error.message : String(error)}`);
+                    }
                 }).finally(() => {
                     // Only clear shouldBeGenerating on successful completion
                     // (errors might want to retry, so this could be handled differently)
@@ -196,7 +209,20 @@ export function handleWebSocketMessage(agent: SimpleCodeGeneratorAgent, connecti
                 
                 agent.handleUserInput(parsedMessage.message, parsedMessage.images).catch((error: unknown) => {
                     logger.error('Error handling user suggestion:', error);
-                    sendError(connection, `Error processing user suggestion: ${error instanceof Error ? error.message : String(error)}`);
+                    // Handle rate limit errors gracefully without breaking WebSocket connection
+                    if (error instanceof Error && (error.message.includes('Rate limit exceeded') || error.message.includes('rate limit'))) {
+                        logger.warn('Rate limit hit during user input processing, sending retry message');
+                        try {
+                            sendToConnection(connection, WebSocketMessageResponses.RATE_LIMIT_WARNING, {
+                                message: 'Rate limit reached. Your request will be processed shortly. Please wait a moment before sending another message.',
+                                retryAfter: 30000 // 30 seconds
+                            });
+                        } catch (wsError) {
+                            logger.error('Failed to send rate limit warning:', wsError);
+                        }
+                    } else {
+                        sendError(connection, `Error processing user suggestion: ${error instanceof Error ? error.message : String(error)}`);
+                    }
                 });
                 break;
             case WebSocketMessageRequests.GET_MODEL_CONFIGS:
